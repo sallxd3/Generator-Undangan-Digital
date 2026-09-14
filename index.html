@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generator Undangan Digital</title>
+
+<style>
+:root {
+    --primary: #25D366;
+    --secondary: #128C7E;
+    --dark: #020617;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    margin: 0;
+    font-family: "Inter", system-ui, sans-serif;
+    background: linear-gradient(135deg, #e0f2fe, #ecfeff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+}
+
+.card {
+    width: 100%;
+    max-width: 540px;
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(18px);
+    border-radius: 24px;
+    padding: 34px;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.15);
+    animation: fadeUp 0.9s ease;
+}
+
+.couple-photo {
+    width: 130px;
+    height: 130px;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 4px solid #ffffff;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.couple-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(25px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+h1 {
+    text-align: center;
+    font-size: 1.7rem;
+    margin-bottom: 6px;
+    color: var(--dark);
+}
+
+.subtitle {
+    text-align: center;
+    font-size: 0.9rem;
+    color: #555;
+    margin-bottom: 30px;
+}
+
+label {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #333;
+}
+
+small {
+    display: block;
+    margin-top: 4px;
+    margin-bottom: 14px;
+    font-size: 0.75rem;
+    color: #666;
+}
+
+input {
+    width: 100%;
+    padding: 15px;
+    margin-top: 6px;
+    border-radius: 16px;
+    border: 1px solid #ddd;
+    font-size: 0.9rem;
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.preview {
+    background: var(--dark);
+    color: #e5e7eb;
+    padding: 15px;
+    border-radius: 16px;
+    font-size: 0.8rem;
+    word-break: break-all;
+    margin-bottom: 18px;
+}
+
+button {
+    width: 100%;
+    padding: 15px;
+    border-radius: 18px;
+    border: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-copy {
+    background: #111827;
+    color: #fff;
+    margin-bottom: 12px;
+}
+
+.btn-copy:hover {
+    background: #020617;
+}
+
+.btn-wa {
+    background: var(--primary);
+    color: white;
+}
+
+.btn-wa:hover {
+    background: var(--secondary);
+}
+
+.footer {
+    text-align: center;
+    font-size: 0.7rem;
+    color: #666;
+    margin-top: 20px;
+}
+
+.toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--dark);
+    color: white;
+    padding: 12px 22px;
+    border-radius: 16px;
+    font-size: 0.85rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: 0.4s;
+}
+.toast.show {
+    opacity: 1;
+}
+</style>
+</head>
+<body>
+
+<div class="card">
+    <div class="couple-photo">
+        <img src="images/2.jpg" alt="Foto Sepri dan Winy">
+    </div>
+
+    <h1>✨ Generator Undangan Digital</h1>
+    <div class="subtitle">
+        Buat undangan personal dan kirim langsung ke WhatsApp dengan tampilan profesional
+    </div>
+
+    <label>🌐 Alamat Website Undangan</label>
+    <input id="webLink" type="text" value="https://ardsky.github.io/Wedding-Sepri-Winy/">
+    <small>Link ini akan digunakan sebagai dasar undangan personal.</small>
+
+    <label>👤 Nama Tamu Undangan</label>
+    <input id="guestName" type="text" placeholder="Contoh: Rahmat Ardian & Keluarga">
+    <small>Nama tamu akan otomatis muncul di halaman undangan.</small>
+
+    <div class="preview" id="resultLink">
+        🔗 Link undangan personal akan ditampilkan di sini
+    </div>
+
+    <button class="btn-copy" onclick="copyLink()">📋 Salin Link Undangan</button>
+    <button class="btn-wa" onclick="shareWA()">💬 Kirim Undangan via WhatsApp</button>
+
+    <div class="footer">
+        Digital Invitation Tool • Simple • Personal • Elegan
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const webInput = document.getElementById("webLink");
+const nameInput = document.getElementById("guestName");
+const preview = document.getElementById("resultLink");
+const toast = document.getElementById("toast");
+
+function generateLink() {
+    const web = webInput.value.trim();
+    const guest = nameInput.value.trim();
+
+    if (!web || !guest) {
+        preview.textContent = "🔗 Link undangan personal akan ditampilkan di sini";
+        return null;
+    }
+
+    const link = `${web}/?to=${encodeURIComponent(guest)}`;
+    preview.textContent = link;
+    return link;
+}
+
+webInput.addEventListener("input", generateLink);
+nameInput.addEventListener("input", generateLink);
+
+function showToast(message) {
+    toast.textContent = message;
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 2000);
+}
+
+function copyLink() {
+    const link = generateLink();
+    if (!link) return showToast("Lengkapi data terlebih dahulu");
+    navigator.clipboard.writeText(link);
+    showToast("Link undangan berhasil disalin");
+}
+
+function shareWA() {
+    const link = generateLink();
+    const guest = nameInput.value.trim();
+    if (!link) return showToast("Nama tamu belum diisi");
+
+    const text = `Assalamualaikum warahmatullahi wabarakatuh
+
+Kepada Yth.
+Bapak/Ibu/Saudara/i
+*${guest}*
+
+Dengan memohon ridho & rahmat Allah SWT, tanpa mengurangi rasa hormat, izinkan kami mengundang Bapak/Ibu/Saudara/i untuk menghadiri acara Resepsi Pernikahan kami :
+
+*Winy & Sepri*
+
+Yang akan dilaksanakan pada :
+
+*Sabtu, 26 September 2026*
+
+Berikut link undangan kami untuk info lengkap dari acara bisa kunjungi :
+
+${link}
+
+
+Mohon maaf atas keterbatasan jarak dan waktu, undangan elektronik ini bersifat resmi (bernilai sama dengan undangan fisik) 
+
+Akan menjadi suatu kehormatan apabila Bapak/Ibu/Saudara/i berkenan hadir di acara kami.
+
+Atas perhatian dan kehadirannya, kami ucapkan terima kasih.
+
+Wassalamu’alaikum Wr. Wb.`;
+
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+}
+</script>
+
+</body>
+</html>
